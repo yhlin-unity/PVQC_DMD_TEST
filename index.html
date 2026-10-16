@@ -106,7 +106,7 @@
                         <label class="block text-sm font-semibold text-slate-700 mb-1">字彙類別：</label>
                         <select id="category-select" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm">
                             <option value="ALL">全部專家級詞彙 (All PVQC Expert Vocabulary)</option>
-                            <option value="PVQC Expert">PVQC Expert 專家級字彙</option>
+                            <option value="PVQC Expert">PVQC DMD Expert 專家級字彙</option>
                         </select>
                     </div>
 
@@ -357,9 +357,9 @@
                 <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-file-csv text-emerald-600 mr-2"></i>匯入自訂 CSV 單字庫</h3>
                 <button onclick="closeCsvModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <p class="text-xs text-slate-500">選取 CSV 檔案匯入。首列可包含欄名，至少需要「英文詞彙」和「中文對照」兩欄；也支援英文、中文、詞性、類別欄位。</p>
-            <input id="csv-file-input" type="file" accept=".csv,text/csv" class="w-full p-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-            <p id="csv-file-name" class="text-xs text-slate-500">尚未選擇 CSV 檔案</p>
+            <p class="text-xs text-slate-500">格式範例（第一列為標題，英文,中文,詞性,類別）：<br><code class="bg-slate-100 p-1 rounded block mt-1 font-mono">animation,動畫,n.,3D/Animation<br>vector,向量,n.,Graphic Design</code></p>
+            
+            <textarea id="csv-input" rows="6" placeholder="直接在此貼上 CSV 內容..." class="w-full p-3 border border-slate-300 rounded-xl font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
 
             <div class="flex justify-end gap-2">
                 <button onclick="closeCsvModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-sm font-semibold text-slate-700">取消</button>
@@ -369,9 +369,10 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-slate-800 text-slate-400 text-xs py-4 text-center mt-auto border-t border-slate-700">
-        PVQC Expert Professional Vocabulary Practice
-    </footer>
+    <footer class="bg-slate-800 text-slate-300 text-xs py-4 text-center">
+  © 2026 治理科技大學 創新設計學院 多媒體設計系 本網站原始程式與頁面設計保留所有權利。<br>
+  PVQC 詞彙資料及第三方字型、圖示與程式庫依各自權利或授權使用。
+</footer>
 
     <!-- JavaScript Application Logic -->
         <script src="script.js"></script>
