@@ -13,6 +13,7 @@
         let testTimerInterval = null;
         let secondsElapsed = 0;
         let testSettings = {};
+        let currentAudioPlayer = null;
 
         // App Initialization
         document.addEventListener('DOMContentLoaded', () => {
@@ -29,6 +30,11 @@
 
         // Tab Switcher
         function switchTab(tabId) {
+            // Returning to the test tab after finishing should show the setup screen.
+            const resultCard = document.getElementById('test-result-card');
+            if (tabId === 'test' && resultCard && !resultCard.classList.contains('hidden')) {
+                resetTestSetup();
+            }
             ['test', 'words', 'review', 'history'].forEach(id => {
                 const sec = document.getElementById(`tab-${id}`);
                 const nav = document.getElementById(`nav-${id}`);
@@ -55,10 +61,19 @@
             });
         }
 
-        // TTS Pronunciation Function
-        function speakWord(text) {
+        // Stop any previous MP3 before starting another pronunciation.
+        function stopCurrentAudio() {
+            if (currentAudioPlayer) {
+                currentAudioPlayer.pause();
+                currentAudioPlayer.currentTime = 0;
+                currentAudioPlayer = null;
+            }
+        }
+
+        // Keep browser speech synthesis as a fallback for words without an MP3.
+        function speakWithBrowserTTS(text) {
             if (!('speechSynthesis' in window)) {
-                alert('您的瀏覽器不支援 Web Speech 語音播放功能。');
+                alert('Your browser does not support speech playback.');
                 return;
             }
             window.speechSynthesis.cancel();
@@ -69,6 +84,36 @@
             window.speechSynthesis.speak(utterance);
         }
 
+        // Match the vocabulary to its MP3; fall back to browser speech if unavailable.
+        function speakWord(text) {
+            if (!text) return;
+            const audioKey = String(text).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+            const fileName = window.PVQC_AUDIO_FILES && window.PVQC_AUDIO_FILES[audioKey];
+            if (!fileName) {
+                speakWithBrowserTTS(text);
+                return;
+            }
+
+            stopCurrentAudio();
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            const player = new Audio('PVQC_Expert_MP3/' + encodeURIComponent(fileName));
+            currentAudioPlayer = player;
+            let fallbackStarted = false;
+            const useFallback = () => {
+                if (fallbackStarted || currentAudioPlayer !== player) return;
+                fallbackStarted = true;
+                currentAudioPlayer = null;
+                speakWithBrowserTTS(text);
+            };
+            player.addEventListener('error', useFallback, { once: true });
+            player.addEventListener('ended', () => {
+                if (currentAudioPlayer === player) currentAudioPlayer = null;
+            }, { once: true });
+            const playPromise = player.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(useFallback);
+            }
+        }
         // Start Test Engine
         function startTest() {
             const radioChecked = document.querySelector('input[name="testType"]:checked');
@@ -118,6 +163,7 @@
 
         // Render Current Question
         function renderQuestion() {
+            stopCurrentAudio();
             const q = testQuestions[currentQIndex];
             const type = testSettings.type;
             const mode = testSettings.mode;
@@ -275,6 +321,7 @@
         }
 
         function finishTest() {
+            stopCurrentAudio();
             clearInterval(testTimerInterval);
             document.getElementById('test-active-card').classList.add('hidden');
             document.getElementById('test-result-card').classList.remove('hidden');
@@ -534,3 +581,6 @@
             }
             return array;
         }
+
+
+
