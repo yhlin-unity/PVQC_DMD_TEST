@@ -124,8 +124,12 @@
 
             // Filter Pool by Category
             let pool = currentVocabulary.filter(item => category === 'ALL' || item.category === category);
-            if (pool.length < 4) {
-                alert('該類別詞彙數量少於 4 個，無法產生四選一題型！');
+            if (pool.length === 0) {
+                alert('所選類別沒有可用詞彙，請改選全部詞彙或匯入有資料的 CSV。');
+                return;
+            }
+            if (testType !== '1' && pool.length < 4) {
+                alert(`目前所選字彙只有 ${pool.length} 個；測驗 ${testType} 需要至少 4 個詞彙才能產生四選一題目。請匯入更多詞彙或改選其他類別。`);
                 return;
             }
 
@@ -226,7 +230,10 @@
             const container = document.getElementById('options-container');
             container.innerHTML = '';
 
-            let wrongCandidates = currentVocabulary.filter(item => item.word !== correctItem.word);
+            const categoryPool = currentVocabulary.filter(item =>
+                testSettings.category === 'ALL' || item.category === testSettings.category
+            );
+            let wrongCandidates = categoryPool.filter(item => item.word !== correctItem.word);
             wrongCandidates = shuffleArray(wrongCandidates).slice(0, 3);
             const choices = shuffleArray([correctItem, ...wrongCandidates]);
 
