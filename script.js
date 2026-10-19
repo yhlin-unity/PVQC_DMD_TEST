@@ -29,6 +29,11 @@
 
         // Tab Switcher
         function switchTab(tabId) {
+            // Returning to the test tab after finishing should show the setup screen.
+            const resultCard = document.getElementById('test-result-card');
+            if (tabId === 'test' && resultCard && !resultCard.classList.contains('hidden')) {
+                resetTestSetup();
+            }
             ['test', 'words', 'review', 'history'].forEach(id => {
                 const sec = document.getElementById(`tab-${id}`);
                 const nav = document.getElementById(`nav-${id}`);
@@ -534,3 +539,4 @@
             }
             return array;
         }
+
