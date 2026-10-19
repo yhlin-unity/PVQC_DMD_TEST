@@ -581,6 +581,3 @@
             }
             return array;
         }
-
-
-
